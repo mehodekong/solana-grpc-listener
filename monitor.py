@@ -60,19 +60,25 @@ def escape_markdown_v2(text: str) -> str:
 
 
 def send_telegram_message(message: str):
-    try:
-        escaped_message = escape_markdown_v2(message)  # 👈 先转义
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        payload = {
-            "chat_id": TELEGRAM_CHAT_ID,
-            "text": escaped_message,
-            "parse_mode": "MarkdownV2"
-        }
-        response = requests.post(url, data=payload)
-        if response.status_code != 200:
-            print(f"Telegram通知失败: {response.text}")
-    except Exception as e:
-        print(f"发送Telegram通知异常: {e}")
+    while True:
+        try:
+            escaped_message = escape_markdown_v2(message)  # 👈 先转义
+            url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+            payload = {
+                "chat_id": TELEGRAM_CHAT_ID,
+                "text": escaped_message,
+                "parse_mode": "MarkdownV2"
+            }
+            response = requests.post(url, data=payload)
+            if response.status_code == 200:
+                break
+            else:
+                print(f"{timestamp()}\nTelegram通知失败: {response.text}")
+                print("重新发送")
+        except Exception as e:
+            print(f"{timestamp()}\n发送Telegram通知异常: {e}")
+            print("重新发送")
+
 
 def timestamp():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -276,12 +282,11 @@ def process_messages(target_wallets):
             print(f"[{timestamp()}] 处理消息异常: {e}")
 
 def run():
-
+    First_start = True
     target_wallets = load_target_wallets()
     if not target_wallets:
         print(f"[{timestamp()}] 错误：未加载到任何监控钱包地址")
         return
-
     threading.Thread(target=process_messages, args=(target_wallets,), daemon=True).start()
     threading.Thread(target=update_sol_price, daemon=True).start()
 
@@ -324,6 +329,10 @@ def run():
                 commitment=geyser_pb2.CommitmentLevel.PROCESSED
             )
             print(f"[{timestamp()}] 已连接到 gRPC，正在监听 {len(target_wallets)} 个地址\n")
+            if First_start:
+                send_telegram_message(f"[{timestamp()}]\n✅已开始监控地址")
+            if not First_start:
+                send_telegram_message(f"[{timestamp()}]\n✅连接错误，已重启监控")
             for response in stub.Subscribe(iter([request])):
                 # 循环中检测控制指令
                 current_state = read_control_state()
@@ -347,10 +356,12 @@ def run():
             else:
                 print(f"[{timestamp()}] gRPC 连接异常: {e}")
             print(f"[{timestamp()}] 5秒后重连...\n")
+            First_start = False
             time.sleep(5)
         except Exception as e:
             print(f"[{timestamp()}] 未知异常: {e}")
             print(f"[{timestamp()}] 5秒后重连...\n")
+            First_start = False
             time.sleep(5)
 
 def read_control_state():
