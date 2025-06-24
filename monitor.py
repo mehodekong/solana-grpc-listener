@@ -19,6 +19,40 @@ TELEGRAM_BOT_TOKEN = "7928616623:AAH-xJNy_jCiEVsA0H0IQNmDPzAse8dwyyk"
 TELEGRAM_CHAT_ID = "7819265227"
 sol_price_usd = 0.0
 message_queue = queue.Queue()
+GITHUB_REPO_URL = "https://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@github.com/mehodkong/solana-grpc-listener.git"
+BRANCH = "main"
+LOCAL_GIT_DIR = "/tmp/my_git_repo"
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
+SOURCE_SUBDIR = "json_files"
+FILE_NAME = "wallet-swap-record.json"
+DEST_SUBDIR = SOURCE_SUBDIR
+
+def setup_git_repo():
+    if os.path.exists(LOCAL_GIT_DIR):
+        shutil.rmtree(LOCAL_GIT_DIR)
+    subprocess.run(["git", "clone", "-b", BRANCH, GITHUB_REPO_URL, LOCAL_GIT_DIR], check=True)
+
+def copy_json_file():
+    src_path = os.path.join(PROJECT_DIR, SOURCE_SUBDIR, FILE_NAME)
+    dest_dir = os.path.join(LOCAL_GIT_DIR, DEST_SUBDIR)
+    os.makedirs(dest_dir, exist_ok=True)
+    dest_path = os.path.join(dest_dir, FILE_NAME)
+    shutil.copy2(src_path, dest_path)
+
+def commit_and_push():
+    subprocess.run(["git", "add", "."], cwd=LOCAL_GIT_DIR, check=True)
+    subprocess.run(["git", "commit", "-m", f"Auto upload {FILE_NAME}"], cwd=LOCAL_GIT_DIR, check=True)
+    subprocess.run(["git", "push"], cwd=LOCAL_GIT_DIR, check=True)
+
+def upload_to_github():
+    try:
+        setup_git_repo()
+        copy_json_file()
+        commit_and_push()
+        print(f"✅ {FILE_NAME} 上传成功")
+        send_telegram_message(f"{timestamp()}\n监听程序退出\n✅ {FILE_NAME} 上传成功")
+    except Exception as e:
+        print(f"❌ 上传失败: {e}")
 
 def to_subscript(n: str) -> str:
     subscript_map = {
@@ -396,9 +430,17 @@ def send_token_to_trader(token_mint):
     except Exception as e:
         print(f"❌ 无法发送代币地址: {e}")
 
+def graceful_exit(*args):
+    print("程序即将退出，开始上传最新文件")
+    upload_to_github()
+    message_queue.put(None)
+    print("程序已退出")
+    sys.exit(0)
+
 if __name__ == "__main__":
-    try:
-        run()
-    except KeyboardInterrupt:
-        print("程序已中断")
-        message_queue.put(None)
+    # 监听 SIGINT（Ctrl+C）和 SIGTERM（systemd 停止）
+    atexit.register(graceful_exit)
+    signal.signal(signal.SIGINT, graceful_exit)
+    signal.signal(signal.SIGTERM, graceful_exit)
+    #主程序
+    run()
