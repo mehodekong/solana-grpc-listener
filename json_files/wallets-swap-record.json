@@ -36,11 +36,11 @@
       "sell_volume": 0
     },
     "AtortPA9SVbkKmdzu5zg4jxgkR4howvPshorA9jYbonk": {
-      "amount": 10935250.003204,
+      "amount": 0.0,
       "buy_count": 1,
       "buy_volume": 60.000017663,
-      "sell_count": 0,
-      "sell_volume": 0
+      "sell_count": 4,
+      "sell_volume": 110.814925149
     },
     "GcHCWh3i6QpWYv4bqhEgpUSrLKMixfpnW7mbae8Upump": {
       "amount": 7252658.116495,
@@ -99,11 +99,11 @@
       "sell_volume": 9.829838378
     },
     "9VY2rDbtsBmTsBxoRF8hWSEUKGqnoQoe9V6W3JnjNgfm": {
-      "amount": 6676379.399123096,
+      "amount": 4176379.399123096,
       "buy_count": 1,
       "buy_volume": 15.002050453,
-      "sell_count": 6,
-      "sell_volume": 121.39154689500002
+      "sell_count": 8,
+      "sell_volume": 149.165444333
     },
     "FLyfuF93mCtzS461VSXStb2Y4ktLazR8niDgkYxqpump": {
       "amount": 23290641.424083,
@@ -225,11 +225,11 @@
       "sell_volume": 14.457752888
     },
     "ArQNTJtmxuWQ77KB7a1PmoZc5Zd25jXmXPDWBX8qVoux": {
-      "amount": 5390338.406642107,
+      "amount": 0.0,
       "buy_count": 0,
       "buy_volume": 0,
-      "sell_count": 1,
-      "sell_volume": 18.88935449
+      "sell_count": 2,
+      "sell_volume": 61.214652869999995
     },
     "4TrLgXh19LmbMzdN5BdxWAYqXGVBMN5NzPYT2BK7pump": {
       "amount": 5866023.396431,
@@ -258,6 +258,96 @@
       "buy_volume": 10.003317598,
       "sell_count": 0,
       "sell_volume": 0
+    },
+    "EnKJ8LVYR7WSSBQyzAuwByZfszxnDn6f5MS2aGnQpump": {
+      "amount": 13474834.280914,
+      "buy_count": 1,
+      "buy_volume": 15.003534894,
+      "sell_count": 0,
+      "sell_volume": 0
+    },
+    "EJDAEWgyRmmx7AMZtnXvqkJEoJMhpBvjQFSHghD1bonk": {
+      "amount": 20584536.775471,
+      "buy_count": 1,
+      "buy_volume": 20.002575378,
+      "sell_count": 0,
+      "sell_volume": 0
+    },
+    "6S5jgnWpZoNGoiybZzFu3RCPgwXCrXjkXM7QgmJgpump": {
+      "amount": 0.0,
+      "buy_count": 1,
+      "buy_volume": 55.006549776,
+      "sell_count": 1,
+      "sell_volume": 28.567189277
+    },
+    "71Jvq4Epe2FCJ7JFSF7jLXdNk1Wy4Bhqd9iL6bEFELvg": {
+      "amount": 750361.970659,
+      "buy_count": 4,
+      "buy_volume": 323.189874908,
+      "sell_count": 12,
+      "sell_volume": 358.1881494359999
+    },
+    "Fiq8K21K62zLFP6q6Wrh7nc4AZJmqoavyTxEX6Bkpump": {
+      "amount": 11763293.956152,
+      "buy_count": 1,
+      "buy_volume": 7.436262364,
+      "sell_count": 0,
+      "sell_volume": 0
+    },
+    "88KKUzT9B5sHRopVgRNn3VEfKh7g4ykLXqqjPT7Hpump": {
+      "amount": 7699942.049558,
+      "buy_count": 1,
+      "buy_volume": 6.120739305,
+      "sell_count": 0,
+      "sell_volume": 0
+    },
+    "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v": {
+      "amount": 64.087641,
+      "buy_count": 1,
+      "buy_volume": 150.115538572,
+      "sell_count": 0,
+      "sell_volume": 0
+    },
+    "7GLB9Ey1TL3WpSrWF4S3vL1V6b1ApTC1bPToS7v2EC7d": {
+      "amount": 20801587.299306,
+      "buy_count": 1,
+      "buy_volume": 15.003271691,
+      "sell_count": 0,
+      "sell_volume": 0
+    },
+    "4mWdf6KV7YyQxUtcjfJ8ZoZDYyHvuP2Vb8bNKj8LTtff": {
+      "amount": 16135477.248682,
+      "buy_count": 1,
+      "buy_volume": 3.002846529,
+      "sell_count": 0,
+      "sell_volume": 0
+    },
+    "9LeQ6P4d5chvWhRndKz4k32fHDXSdtR6KTwsrvWwbonk": {
+      "amount": 9842837.352716,
+      "buy_count": 1,
+      "buy_volume": 20.00301064,
+      "sell_count": 0,
+      "sell_volume": 0
+    },
+    "DoC1T2uvJyRjtihzTRkhj8n1WgQm6CYyfJkb3cSapump": {
+      "amount": 29533968.770423,
+      "buy_count": 1,
+      "buy_volume": 4.002090957,
+      "sell_count": 0,
+      "sell_volume": 0
+    },
+    "A8YHuvQBMAxXoZAZE72FyC8B7jKHo8RJyByXRRffpump": {
+      "amount": 0.0,
+      "buy_count": 1,
+      "buy_volume": 70.001810743,
+      "sell_count": 2,
+      "sell_volume": 85.131999733
+    },
+    "BakGV2drRTXM3h41qGgrgMWknoTmgWFHKtfrvVfLoBLV": {
+      "amount": 6233728.021126037,
+      "buy_count": 1,
+      "buy_volume": 25.003513038,
+      "sell_count": 3,
+      "sell_volume": 46.068950775999994
     }
   }
-}
