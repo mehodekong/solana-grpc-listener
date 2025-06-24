@@ -10,6 +10,10 @@ import os
 import requests
 from decimal import Decimal, ROUND_DOWN
 import socket
+import signal
+import sys
+import subprocess
+import shutil
 
 wallets_file = "json_files/wallets-to-subscribe.json"
 record_swap_file = "json_files/wallets-swap-record.json"
@@ -19,40 +23,45 @@ TELEGRAM_BOT_TOKEN = "7928616623:AAH-xJNy_jCiEVsA0H0IQNmDPzAse8dwyyk"
 TELEGRAM_CHAT_ID = "7819265227"
 sol_price_usd = 0.0
 message_queue = queue.Queue()
-GITHUB_REPO_URL = "https://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@github.com/mehodkong/solana-grpc-listener.git"
-BRANCH = "main"
-LOCAL_GIT_DIR = "/tmp/my_git_repo"
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
-SOURCE_SUBDIR = "json_files"
-FILE_NAME = "wallet-swap-record.json"
-DEST_SUBDIR = SOURCE_SUBDIR
+FILE_NAME = "wallets-swap-record.json"
+RELATIVE_FILE_PATH = os.path.join("json_files", FILE_NAME)
+FILE_PATH = os.path.join(PROJECT_DIR, RELATIVE_FILE_PATH)
 
-def setup_git_repo():
-    if os.path.exists(LOCAL_GIT_DIR):
-        shutil.rmtree(LOCAL_GIT_DIR)
-    subprocess.run(["git", "clone", "-b", BRANCH, GITHUB_REPO_URL, LOCAL_GIT_DIR], check=True)
+def setup_git_user(name, email, global_config=False):
+    if global_config:
+        subprocess.run(["git", "config", "--global", "user.name", name], check=True)
+        subprocess.run(["git", "config", "--global", "user.email", email], check=True)
+    else:
+        subprocess.run(["git", "config", "user.name", name], check=True)
+        subprocess.run(["git", "config", "user.email", email], check=True)
 
-def copy_json_file():
-    src_path = os.path.join(PROJECT_DIR, SOURCE_SUBDIR, FILE_NAME)
-    dest_dir = os.path.join(LOCAL_GIT_DIR, DEST_SUBDIR)
-    os.makedirs(dest_dir, exist_ok=True)
-    dest_path = os.path.join(dest_dir, FILE_NAME)
-    shutil.copy2(src_path, dest_path)
-
-def commit_and_push():
-    subprocess.run(["git", "add", "."], cwd=LOCAL_GIT_DIR, check=True)
-    subprocess.run(["git", "commit", "-m", f"Auto upload {FILE_NAME}"], cwd=LOCAL_GIT_DIR, check=True)
-    subprocess.run(["git", "push"], cwd=LOCAL_GIT_DIR, check=True)
+def has_staged_changes():
+    # 判断是否有待提交内容
+    result = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=PROJECT_DIR)
+    return result.returncode != 0
 
 def upload_to_github():
     try:
-        setup_git_repo()
-        copy_json_file()
-        commit_and_push()
-        print(f"✅ {FILE_NAME} 上传成功")
-        send_telegram_message(f"{timestamp()}\n监听程序退出\n✅ {FILE_NAME} 上传成功")
+        # 设置 Git 用户名邮箱（针对当前仓库）
+        setup_git_user("mehodekong", "3304318271@qq.com", global_config=False)
+
+        # 确保只跟踪指定文件
+        subprocess.run(["git", "add", RELATIVE_FILE_PATH], cwd=PROJECT_DIR, check=True)
+
+        if has_staged_changes():
+            subprocess.run(["git", "commit", "-m", f"Auto upload {FILE_NAME}"], cwd=PROJECT_DIR, check=True)
+            subprocess.run(["git", "push"], cwd=PROJECT_DIR, check=True)
+            print(f"✅ {FILE_NAME} 上传成功")
+            send_telegram_message(f"{timestamp()}\n✅ {FILE_NAME} 上传成功")
+        else:
+            print("📂 没有需要提交的改动，跳过提交")
+            send_telegram_message(f"{timestamp()}\n📂 没有需要提交的改动，跳过提交")
+
     except Exception as e:
         print(f"❌ 上传失败: {e}")
+        send_telegram_message(f"{timestamp()}\n❌ 上传失败: {e}")
+
 
 def to_subscript(n: str) -> str:
     subscript_map = {
@@ -439,7 +448,6 @@ def graceful_exit(*args):
 
 if __name__ == "__main__":
     # 监听 SIGINT（Ctrl+C）和 SIGTERM（systemd 停止）
-    atexit.register(graceful_exit)
     signal.signal(signal.SIGINT, graceful_exit)
     signal.signal(signal.SIGTERM, graceful_exit)
     #主程序
