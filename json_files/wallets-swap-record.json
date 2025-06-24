@@ -36,11 +36,11 @@
       "sell_volume": 0
     },
     "AtortPA9SVbkKmdzu5zg4jxgkR4howvPshorA9jYbonk": {
-      "amount": 2815980.386793,
+      "amount": 0.0,
       "buy_count": 1,
       "buy_volume": 60.000017663,
-      "sell_count": 3,
-      "sell_volume": 78.676170434
+      "sell_count": 4,
+      "sell_volume": 110.814925149
     },
     "GcHCWh3i6QpWYv4bqhEgpUSrLKMixfpnW7mbae8Upump": {
       "amount": 7252658.116495,
@@ -335,6 +335,20 @@
       "buy_volume": 4.002090957,
       "sell_count": 0,
       "sell_volume": 0
+    },
+    "A8YHuvQBMAxXoZAZE72FyC8B7jKHo8RJyByXRRffpump": {
+      "amount": 0.0,
+      "buy_count": 1,
+      "buy_volume": 70.001810743,
+      "sell_count": 2,
+      "sell_volume": 85.131999733
+    },
+    "BakGV2drRTXM3h41qGgrgMWknoTmgWFHKtfrvVfLoBLV": {
+      "amount": 6233728.021126037,
+      "buy_count": 1,
+      "buy_volume": 25.003513038,
+      "sell_count": 3,
+      "sell_volume": 46.068950775999994
     }
   }
 }
