@@ -55,7 +55,7 @@ def upload_to_github():
             send_telegram_message(f"[{timestamp()}]\n✅ {FILE_NAME} 上传成功\n🛑 终止程序")
         else:
             print("📂 没有需要提交的改动，跳过提交")
-            send_telegram_message(f"[{timestamp()}]\n📂 没有需要提交的改动，跳过提交\n🛑 终止监控")
+            send_telegram_message(f"[{timestamp()}]\n📂 没有需要提交的改动，跳过提交\n🛑 终止程序")
 
     except Exception as e:
         print(f"❌ 上传失败: {e}")
