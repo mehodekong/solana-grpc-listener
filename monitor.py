@@ -13,7 +13,6 @@ import socket
 import signal
 import sys
 import subprocess
-import shutil
 
 wallets_file = "json_files/wallets-to-subscribe.json"
 record_swap_file = "json_files/wallets-swap-record.json"
@@ -53,14 +52,14 @@ def upload_to_github():
             subprocess.run(["git", "commit", "-m", f"Auto upload {FILE_NAME}"], cwd=PROJECT_DIR, check=True)
             subprocess.run(["git", "push"], cwd=PROJECT_DIR, check=True)
             print(f"✅ {FILE_NAME} 上传成功")
-            send_telegram_message(f"{timestamp()}\n✅ {FILE_NAME} 上传成功")
+            send_telegram_message(f"[{timestamp()}]\n✅ {FILE_NAME} 上传成功\n终止程序")
         else:
             print("📂 没有需要提交的改动，跳过提交")
-            send_telegram_message(f"{timestamp()}\n📂 没有需要提交的改动，跳过提交")
+            send_telegram_message(f"[{timestamp()}]\n📂 没有需要提交的改动，跳过提交,终止监控")
 
     except Exception as e:
         print(f"❌ 上传失败: {e}")
-        send_telegram_message(f"{timestamp()}\n❌ 上传失败: {e}")
+        send_telegram_message(f"[{timestamp()}]\n❌ 上传失败: {e}")
 
 
 def to_subscript(n: str) -> str:
@@ -375,7 +374,7 @@ def run():
             if First_start:
                 send_telegram_message(f"[{timestamp()}]\n✅已开始监控地址")
             if not First_start:
-                send_telegram_message(f"[{timestamp()}]\n✅连接错误，已重启监控")
+                print(f"[{timestamp()}]\n✅连接错误，已重启监控")
             for response in stub.Subscribe(iter([request])):
                 # 循环中检测控制指令
                 current_state = read_control_state()
