@@ -52,10 +52,10 @@ def upload_to_github():
             subprocess.run(["git", "commit", "-m", f"Auto upload {FILE_NAME}"], cwd=PROJECT_DIR, check=True)
             subprocess.run(["git", "push"], cwd=PROJECT_DIR, check=True)
             print(f"✅ {FILE_NAME} 上传成功")
-            send_telegram_message(f"[{timestamp()}]\n✅ {FILE_NAME} 上传成功\n终止程序")
+            send_telegram_message(f"[{timestamp()}]\n✅ {FILE_NAME} 上传成功\n🛑 终止程序")
         else:
             print("📂 没有需要提交的改动，跳过提交")
-            send_telegram_message(f"[{timestamp()}]\n📂 没有需要提交的改动，跳过提交,终止监控")
+            send_telegram_message(f"[{timestamp()}]\n📂 没有需要提交的改动，跳过提交\n🛑 终止监控")
 
     except Exception as e:
         print(f"❌ 上传失败: {e}")
@@ -372,9 +372,9 @@ def run():
             )
             print(f"[{timestamp()}] 已连接到 gRPC，正在监听 {len(target_wallets)} 个地址\n")
             if First_start:
-                send_telegram_message(f"[{timestamp()}]\n✅已开始监控地址")
+                send_telegram_message(f"[{timestamp()}]\n✅ 已开始监控地址")
             if not First_start:
-                print(f"[{timestamp()}]\n✅连接错误，已重启监控")
+                print(f"[{timestamp()}]\n⚠️ 连接错误，✅ 已重启监控")
             for response in stub.Subscribe(iter([request])):
                 # 循环中检测控制指令
                 current_state = read_control_state()
@@ -439,10 +439,10 @@ def send_token_to_trader(token_mint):
         print(f"❌ 无法发送代币地址: {e}")
 
 def graceful_exit(*args):
-    print("程序即将退出，开始上传最新文件")
+    print("❗程序即将退出，开始上传最新文件")
     upload_to_github()
     message_queue.put(None)
-    print("程序已退出")
+    print("🛑 程序已退出")
     sys.exit(0)
 
 if __name__ == "__main__":
