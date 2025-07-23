@@ -300,9 +300,9 @@ def process_messages(target_wallets):
                     continue
                 old_buy_count = records.get(wallet, {}).get(token_address, {}).get("buy_count", 0)
                 old_sell_count = records.get(wallet, {}).get(token_address, {}).get("sell_count", 0)
-                symbol = records.get(wallet, {}).get(token_address, {}).get("symbol", None)
-                if symbol is None:
-                    symbol = get_token_symbol(token_address)
+                # symbol = records.get(wallet, {}).get(token_address, {}).get("symbol", None)
+                # if symbol is None:
+                #     symbol = get_token_symbol(token_address)
                 sol_price = get_sol_price()
                 if buy_amount > 0:
                     # send_token_to_trader(token_address)
@@ -451,20 +451,20 @@ def graceful_exit(*args):
     print("🛑 程序已退出")
     sys.exit(0)
 
-def get_token_symbol(token_address: str) -> str:
-    while True:
-        try:
-            url = f"https://api.coingecko.com/api/v3/coins/solana/contract/{token_address}"
-            response = requests.get(url, timeout=5)
-            if response.status_code == 200:
-                data = response.json()
-                symbol = data.get('symbol', '').upper()
-                return symbol if symbol else 'UNKNOWN'
-            else:
-                 print("重新获取")
-        except Exception as e:
-            print(f"查询失败: {e}")
-            return 'UNKNOWN'
+# def get_token_symbol(token_address: str) -> str:
+#     while True:
+#         try:
+#             url = f"https://api.coingecko.com/api/v3/coins/solana/contract/{token_address}"
+#             response = requests.get(url, timeout=5)
+#             if response.status_code == 200:
+#                 data = response.json()
+#                 symbol = data.get('symbol', '').upper()
+#                 return symbol if symbol else 'UNKNOWN'
+#             else:
+#                  print("重新获取")
+#         except Exception as e:
+#             print(f"查询失败: {e}")
+#             return 'UNKNOWN'
 
 if __name__ == "__main__":
     # 监听 SIGINT（Ctrl+C）和 SIGTERM（systemd 停止）
