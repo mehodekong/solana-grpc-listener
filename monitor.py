@@ -185,7 +185,7 @@ def update_wallet_record(records, wallet, symbol, token_address, buy_amount, buy
         }
     token_data = records[wallet][token_address]
     token_data["amount"] = current_amount
-    if symbol:
+    if not token_data["symbol"]:
         token_data["symbol"] = symbol
     if buy_amount > 0:
         token_data["buy_count"] += 1
