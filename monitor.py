@@ -171,11 +171,12 @@ def save_records(records):
     with open(record_swap_file, "w") as f:
         json.dump(records, f, indent=2)
 
-def update_wallet_record(records, wallet, token_address, buy_amount, buy_sol, sell_amount, sell_sol, current_amount):
+def update_wallet_record(records, wallet, symbol, token_address, buy_amount, buy_sol, sell_amount, sell_sol, current_amount):
     if wallet not in records:
         records[wallet] = {}
     if token_address not in records[wallet]:
         records[wallet][token_address] = {
+            "symbol":symbol,
             "amount": 0,
             "buy_count": 0,
             "buy_volume": 0,
@@ -295,29 +296,30 @@ def process_messages(target_wallets):
                 if token_address is None:
                     print(f"[{timestamp()}] 非代币交易，跳过\n")
                     continue
+                symbol = get_token_symbol(token_address)
                 old_buy_count = records.get(wallet, {}).get(token_address, {}).get("buy_count", 0)
                 old_sell_count = records.get(wallet, {}).get(token_address, {}).get("sell_count", 0)
                 sol_price = get_sol_price()
                 if buy_amount > 0:
                     # send_token_to_trader(token_address)
                     token_price = (sol_amount * sol_price) / buy_amount
-                    message = f"[{timestamp()}]\n钱包:{wallet}\nToken:`{token_address}`\n[买入]第{old_buy_count + 1}次\n数量:{format_amount(buy_amount)}\n余额:{format_amount(current_amount)}\n价格:${format_zero_subscript(token_price)}\n金额:{sol_amount:.2f} SOL\n"
+                    message = f"[{timestamp()}]\n钱包:{wallet}\n符号:{symbol}\nToken:`{token_address}`\n[买入]第{old_buy_count + 1}次\n数量:{format_amount(buy_amount)}\n余额:{format_amount(current_amount)}\n价格:${format_zero_subscript(token_price)}\n金额:{sol_amount:.2f} SOL\n"
                     if old_buy_count == 0 and first_buy:
                         message = f"🔔 首次[🟢买入]消息❗\n{message}"
                     print(message)
                     send_telegram_message(message)
                 if sell_amount > 0 and old_buy_count != 0:
                     token_price = (sol_amount * sol_price) / sell_amount
-                    message = f"[{timestamp()}]\n钱包:{wallet}\nToken:`{token_address}`\n[卖出]第{old_sell_count + 1}次\n数量:{format_amount(sell_amount)}\n余额:{format_amount(current_amount)}\n价格:${format_zero_subscript(token_price)}\n金额:{sol_amount:.2f} SOL\n"
+                    message = f"[{timestamp()}]\n钱包:{wallet}\n符号:{symbol}\nToken:`{token_address}`\n[卖出]第{old_sell_count + 1}次\n数量:{format_amount(sell_amount)}\n余额:{format_amount(current_amount)}\n价格:${format_zero_subscript(token_price)}\n金额:{sol_amount:.2f} SOL\n"
                     if old_sell_count == 0:
                         message = f"🔔 首次[🔴卖出]消息❗\n{message}"
                     print(message)
                     send_telegram_message(message)
                 if send_amount > 0:
-                    message = f"[{timestamp()}]\n钱包:{wallet}\nToken:`{token_address}`\n[转出]\n数量:{format_amount(send_amount)}\n余额:{format_amount(current_amount)}\n"
+                    message = f"[{timestamp()}]\n钱包:{wallet}\n符号:{symbol}\nToken:`{token_address}`\n[转出]\n数量:{format_amount(send_amount)}\n余额:{format_amount(current_amount)}\n"
                     print(message)
                     send_telegram_message(message)
-                records = update_wallet_record(records, wallet, token_address, buy_amount, sol_amount if buy_amount > 0 else 0, sell_amount,sol_amount if sell_amount > 0 else 0, current_amount)
+                records = update_wallet_record(records, wallet, symbol, token_address, buy_amount, sol_amount if buy_amount > 0 else 0, sell_amount,sol_amount if sell_amount > 0 else 0, current_amount)
                 save_records(records)
 
         except Exception as e:
@@ -372,7 +374,7 @@ def run():
             )
             print(f"[{timestamp()}] 已连接到 gRPC，正在监听 {len(target_wallets)} 个地址\n")
             if First_start:
-                send_telegram_message(f"[{timestamp()}]\n✅ 已开始监控地址")
+                send_telegram_message(f"[{timestamp()}]\n✅已开始监控地址")
             if not First_start:
                 print(f"[{timestamp()}]\n⚠️ 连接错误，✅ 已重启监控")
             for response in stub.Subscribe(iter([request])):
@@ -439,11 +441,29 @@ def send_token_to_trader(token_mint):
         print(f"❌ 无法发送代币地址: {e}")
 
 def graceful_exit(*args):
-    print("❗程序即将退出，开始上传最新文件")
+    print("❗ 程序即将退出，开始上传最新文件")
     upload_to_github()
     message_queue.put(None)
     print("🛑 程序已退出")
     sys.exit(0)
+
+def get_token_symbol(token_address: str) -> str:
+    while True:
+        try:
+            url = f"https://public-api.birdeye.so/public/token/{token_address}"
+            headers = {
+                "accept": "application/json",
+                "X-API-KEY": "demo"  # 你可以替换为自己的 API Key
+            }
+            response = requests.get(url, headers=headers, timeout=5)
+            data = response.json()
+            if response.status_code == 200 and 'data' in data:
+                return data['data'].get('symbol', 'UNKNOWN')
+            else:
+                 print("重新获取")
+        except Exception as e:
+            print(f"查询失败: {e}")
+            return 'UNKNOWN'
 
 if __name__ == "__main__":
     # 监听 SIGINT（Ctrl+C）和 SIGTERM（systemd 停止）
