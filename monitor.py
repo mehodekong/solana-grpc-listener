@@ -176,7 +176,7 @@ def update_wallet_record(records, wallet, symbol, token_address, buy_amount, buy
         records[wallet] = {}
     if token_address not in records[wallet]:
         records[wallet][token_address] = {
-            "symbol":symbol,
+            "symbol": None,
             "amount": 0,
             "buy_count": 0,
             "buy_volume": 0,
@@ -185,6 +185,8 @@ def update_wallet_record(records, wallet, symbol, token_address, buy_amount, buy
         }
     token_data = records[wallet][token_address]
     token_data["amount"] = current_amount
+    if symbol:
+        token_data["symbol"] = symbol
     if buy_amount > 0:
         token_data["buy_count"] += 1
         token_data["buy_volume"] += buy_sol
@@ -296,9 +298,11 @@ def process_messages(target_wallets):
                 if token_address is None:
                     print(f"[{timestamp()}] 非代币交易，跳过\n")
                     continue
-                symbol = get_token_symbol(token_address)
                 old_buy_count = records.get(wallet, {}).get(token_address, {}).get("buy_count", 0)
                 old_sell_count = records.get(wallet, {}).get(token_address, {}).get("sell_count", 0)
+                symbol = records.get(wallet, {}).get(token_address, {}).get("symbol", None)
+                if symbol is None:
+                    symbol = get_token_symbol(token_address)
                 sol_price = get_sol_price()
                 if buy_amount > 0:
                     # send_token_to_trader(token_address)
@@ -450,15 +454,12 @@ def graceful_exit(*args):
 def get_token_symbol(token_address: str) -> str:
     while True:
         try:
-            url = f"https://public-api.birdeye.so/public/token/{token_address}"
-            headers = {
-                "accept": "application/json",
-                "X-API-KEY": "demo"  # 你可以替换为自己的 API Key
-            }
-            response = requests.get(url, headers=headers, timeout=5)
-            data = response.json()
-            if response.status_code == 200 and 'data' in data:
-                return data['data'].get('symbol', 'UNKNOWN')
+            url = f"https://api.coingecko.com/api/v3/coins/solana/contract/{token_address}"
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                symbol = data.get('symbol', '').upper()
+                return symbol if symbol else 'UNKNOWN'
             else:
                  print("重新获取")
         except Exception as e:
